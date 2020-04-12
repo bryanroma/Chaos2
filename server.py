@@ -92,12 +92,13 @@ def console(conn,bot,socket_target):
 def generatePayload():
     print("[*] Let's generate payloads")
 
-    # Python payload already exists?
+    # Python payload already exists? delete that fucker
     if os.path.exists("generated/payload.py"):
         os.remove("generated/payload.py")
     else:
         pass
-
+    # Read from listener.py , and replace both port and host to those introduced by user, then append to payload.py
+    print("[!] Defaults to 127.0.0.1 - 443")
     lhost=input("LHOST> ") or "127.0.0.1"
     lport=input("LPORT> ") or "443"
     # Read payload file, and replace host variable 
