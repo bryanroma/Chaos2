@@ -1,6 +1,12 @@
 # Chaos2
 C&amp;C written in Python3
 
+Available payloads: 
+  - Linux
+    - python3
+  - Windows
+    - C++ and PS mix
+
 Windows:
   - Generate .cpp 
   - Compile with Wine (Cross-compile)
