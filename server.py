@@ -111,8 +111,16 @@ def generatePayload():
                 x.write(line)
     f.close()
     print(Fore.YELLOW,"[*] Creating .exe payload for win targets . . .", Style.RESET_ALL)
-    #os.system("pyinstaller --onefile -w generated/payload.py")
     # We need to compile using wine bruuuuhhhhh, :()
+    # $ sudo apt-get install wine
+    # $ wget https://www.python.org/ftp/python/2.7.9/python-2.7.9.amd64.msi
+    # $ wine msiexec /i python-2.7.9.amd64.msi /qb
+    # $ sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get install wine32
+    # $ cd ~/.wine/drive_c/Python27
+    # $ wine python.exe Scripts/pip.exe install pyinstaller
+    # $ wine ~/.wine/drive_c/Python27/Scripts/pyinstaller.exe --onefile helloworld.py
+    
+    
     print(Fore.YELLOW,"[*] .exe created! Check dist folder!  . . .",Style.RESET_ALL)
 
 
