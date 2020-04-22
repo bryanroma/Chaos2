@@ -16,4 +16,6 @@ Linux:
   - Run python3 payload.py
   - Done. LOL.
   
-  
+  # ALTERNATIVES TO pyinstaller
+# CHECK :  https://anthony-tuininga.github.io/cx_Freeze/
+# CHECK : https://nuitka.net/
