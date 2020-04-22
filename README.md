@@ -4,8 +4,10 @@ C&amp;C written in Python3
 Available payloads: 
   - Linux
     - python3
+    - python2
   - Windows
     - C++ and PS mix
+    
 
 Windows:
   - Generate .cpp 
