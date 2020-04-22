@@ -6,14 +6,11 @@ Available payloads:
     - python3
     - python2
   - Windows
-    - C++ and PS mix
+    - python2
     
 
 Windows:
-  - Generate .cpp 
-  - Compile with Wine (Cross-compile)
-  - Execute on victim, receive conn back on Chaos2
-  - Run shell, ( connect to server, download nish.ps1, run it, catch with ncat)
+  - Generate payload, and execute .exe in victim.
   
 Linux:
   - Run python3 payload.py
