@@ -142,7 +142,7 @@ def generatePayload():
 
     print(Fore.YELLOW,"[*] Create .exe payload for win targets . . .", Style.RESET_ALL)
     path=pathlib.Path().absolute()
-    print("cd ",path," && ","wine ~/.wine/drive_c/Python27/Scripts/pyinstaller.exe --onefile generated/payload2.py")
+    print("cd ",path," && ","wine ~/.wine/drive_c/Python27/Scripts/pyinstaller.exe --onefile --noconsole --specpath generated --distpath generated --workpath generated generated/payload2.py")
 
 def check_tool(tool):
     # Check if wine is installed
