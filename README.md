@@ -17,7 +17,7 @@ Available payloads:
     - python3
     - python2
   - Windows
-    - python2
+    - python2 to .exe
     
 
 Windows:
