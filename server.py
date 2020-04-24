@@ -13,8 +13,6 @@ from colorama import Fore, Style
 conn_list={}
 
 
-
-
 def server():
     global conn_list
     global PORT
