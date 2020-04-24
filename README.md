@@ -20,12 +20,7 @@ Available payloads:
     - python2 to .exe
     
 
-Windows:
-  - Generate payload, and execute .exe in victim.
-  
-Linux:
-  - Run python3 payload.py
-  - Done. LOL.
+Generated payloads will be build in generated folder.
   
 
 
