@@ -1,5 +1,6 @@
 # Chaos2
-C&amp;C written in Python3
+C&amp;C written in Python3 while being in quarantine mode by COVID-19. 
+I got bored, and created this :3
 
 
 ### Requisites
