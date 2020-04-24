@@ -3,6 +3,7 @@ C&amp;C written in Python3
 
 
 ### Requisites
+  - Kali / ParrotOS is encouraged
   - Wine
     ```bash
     sudo apt-get install wine
